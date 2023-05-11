@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\School;
+use App\Models\Event;
+use App\Models\Familyparent;
 
 class Student extends Model
 {
@@ -32,12 +34,16 @@ class Student extends Model
 
     public function schools()
     {
-        return $this->belongsToMany(School::class, 'school_has_students')
-                    ->withPivot('entry_year', 'exit_year');
+        return $this->belongsToMany(School::class, 'school_has_students');
     }
 
     public function events()
     {
         return $this->belongsToMany(Event::class, 'school_has_students', 'student_id', 'event_id');
+    }
+
+    public function familyParents()
+    {
+        return $this->belongsTo(Familyparent::class, 'parents_id');
     }
 }

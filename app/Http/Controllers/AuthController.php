@@ -38,8 +38,8 @@ class AuthController extends Controller
                 ], 401);
             }
             
-            // $user->getRoleNames();
-            // $user->getPermissionsViaRoles();
+            $user->getRoleNames();
+            $user->getPermissionsViaRoles();
             $token = $user->createToken('myapptoken')->plainTextToken;
             $response = [
                 'data' => $user,
@@ -59,12 +59,14 @@ class AuthController extends Controller
     }
 
     public function register(Request $request) {
-        try {
             $data = json_decode($request->getContent(), true);
             $request = new Request($data);
-            $validatedData = $request->validate([
-                'school_id' => 'required|integer',
-                'event_id' => 'required|integer',
+        try {
+
+            $fields = $request->validate([
+                'school_id' => 'required|numeric|exists:schools,id',
+                'event_id' => 'required|numeric|exists:events,id',
+
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',
                 'birthdate' => 'required|date',
@@ -72,28 +74,31 @@ class AuthController extends Controller
                 'passport' => 'required|string|max:255|unique:students,passport',
                 'valid_visa' => 'required|boolean',
                 'end_of_validity' => 'required|date',
-                'student_email' => 'required|string|email|unique:students,student_email',
+                'student_email' => 'required|email|unique:students,student_email',
                 'residence_country' => 'required|string|max:255',
                 'city' => 'required|string|max:255',
-                'postal_code' => 'required|integer',
+                'postal_code' => 'required|string|max:255',
+
                 'emergency_contact_full_name' => 'required|string|max:255',
                 'emergency_contact_relationship' => 'required|string|max:255',
-                'emergency_contact_email' => 'required|string|email|max:255',
+                'emergency_contact_email' => 'required|email|max:255',
                 'emergency_contact_phone_number' => 'required|string|max:255',
+
                 'mothers_name' => 'required|string|max:255',
                 'mothers_phone' => 'required|string|max:255',
-                'mothers_email' => 'required|string|email|unique:familyparents,mothers_email',
+                'mothers_email' => 'required|email|unique:familyparents,mothers_email',
                 'fathers_name' => 'required|string|max:255',
                 'fathers_phone' => 'required|string|max:255',
-                'fathers_email' => 'required|string|email|unique:familyparents,fathers_email',
-                'email' => 'required|string|email|unique:users,email',
-                'password' => 'required|string|min:8',
+                'fathers_email' => 'required|email|unique:familyparents,fathers_email',
+
+                'email' => 'required|email|unique:users,email',
+                'password' => 'required|string|min:8'
             ]);
         
             // Crear los modelos correspondientes
             $user = User::create([
-                'email' => $validatedData['email'],
-                'password' => bcrypt($validatedData['password']),
+                'email' => $fields['email'],
+                'password' => bcrypt($fields['password']),
             ]);
 
             $role = Role::where('name', 'Tutor')->first();
@@ -103,48 +108,50 @@ class AuthController extends Controller
             
 
             $familyParents = FamilyParent::create([
-                'mothers_name' => $validatedData['mothers_name'],
-                'mothers_phone' => $validatedData['mothers_phone'],
-                'mothers_email' => $validatedData['mothers_email'],
-                'fathers_name' => $validatedData['fathers_name'],
-                'fathers_phone' => $validatedData['fathers_phone'],
-                'fathers_email' => $validatedData['fathers_email'],
+                'mothers_name' => $fields['mothers_name'],
+                'mothers_phone' => $fields['mothers_phone'],
+                'mothers_email' => $fields['mothers_email'],
+                'fathers_name' => $fields['fathers_name'],
+                'fathers_phone' => $fields['fathers_phone'],
+                'fathers_email' => $fields['fathers_email'],
                 'user_id' => $user->id, //asociando el usuario a los padres
             ]);
 
             $student = Student::create([
-                'first_name' => $validatedData['first_name'],
-                'last_name' => $validatedData['last_name'],
-                'birthdate' => $validatedData['birthdate'],
-                'nationality' => $validatedData['nationality'],
-                'passport' => $validatedData['passport'],
-                'valid_visa' => $validatedData['valid_visa'],
-                'end_of_validity' => $validatedData['end_of_validity'],
-                'student_email' => $validatedData['student_email'],
-                'residence_country' => $validatedData['residence_country'],
-                'city' => $validatedData['city'],
-                'postal_code' => $validatedData['postal_code'],
-                'emergency_contact_full_name' => $validatedData['emergency_contact_full_name'],
-                'emergency_contact_relationship' => $validatedData['emergency_contact_relationship'],
-                'emergency_contact_email' => $validatedData['emergency_contact_email'],
-                'emergency_contact_phone_number' => $validatedData['emergency_contact_phone_number'],
+                'first_name' => $fields['first_name'],
+                'last_name' => $fields['last_name'],
+                'birthdate' => $fields['birthdate'],
+                'nationality' => $fields['nationality'],
+                'passport' => $fields['passport'],
+                'valid_visa' => $fields['valid_visa'],
+                'end_of_validity' => $fields['end_of_validity'],
+                'student_email' => $fields['student_email'],
+                'residence_country' => $fields['residence_country'],
+                'city' => $fields['city'],
+                'postal_code' => $fields['postal_code'],
+                'emergency_contact_full_name' => $fields['emergency_contact_full_name'],
+                'emergency_contact_relationship' => $fields['emergency_contact_relationship'],
+                'emergency_contact_email' => $fields['emergency_contact_email'],
+                'emergency_contact_phone_number' => $fields['emergency_contact_phone_number'],
                 'parents_id' => $familyParents->id //asociando el estudiante a los padres
             ]);
 
 
             // Asociar el estudiante con la escuela correspondiente
             $schoolHasStudent = new SchoolHasStudent;
-            $schoolHasStudent->school_id = $validatedData['school_id'];
+            $schoolHasStudent->school_id = $fields['school_id'];
             $schoolHasStudent->student_id = $student->id;
-            $schoolHasStudent->event_id = $validatedData['event_id'];
+            $schoolHasStudent->event_id = $fields['event_id'];
             $schoolHasStudent->save();
 
             // Retornamos una respuesta con los datos del usuario creado
-            return response()->json([
+
+            $response = [
                 'data' => $user,
                 'message' => 'Usuario creado exitosamente.'
-            ], 201);
+            ];
 
+            return response($response, 201);
 
         } catch (QueryException $exception) {
             $response = [

@@ -18,9 +18,27 @@ class StudentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function showStudents()
     {
-        //
+        try {
+            $student = Student::with(['familyParents', 'schools', 'events'])->get();
+
+            $response = [
+                'data' => $student,
+                'message' => 'Student retrived successfully',
+                'status_code' => 200,
+            ];
+
+            return response($response, 200);
+        } catch (QueryException $exception) {
+            $response = [
+                'message' => 'An error occurred while geting students',
+                'error' => $exception->getMessage(),
+                'status_code' => 500,
+            ];
+
+            return response($response, 500);
+        }
     }
 
     //no termianda
@@ -33,23 +51,25 @@ class StudentController extends Controller
 
             // Validar los datos de entrada
             $fields = $request->validate([
-                'first_name' => 'required|max:255',
-                'last_name' => 'required|max:255',
+                'school_id' => 'required|numeric|exists:schools,id',
+                'event_id' => 'required|numeric|exists:events,id',
+
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
                 'birthdate' => 'required|date',
-                'nationality' => 'required|max:255',
-                'passport' => 'required|max:255',
-                'valid_visa' => 'required|max:255',
+                'nationality' => 'required|string|max:255',
+                'passport' => 'required|string|max:255|unique:students,passport',
+                'valid_visa' => 'required|boolean',
                 'end_of_validity' => 'required|date',
-                'student_email' => 'required|email|unique:students',
-                'residence_country' => 'required|max:255',
-                'city' => 'required|max:255',
-                'postal_code' => 'required|integer',
-                'emergency_contact_full_name' => 'required|max:255',
-                'emergency_contact_relationship' => 'required|max:255',
-                'emergency_contact_email' => 'required|email',
-                'emergency_contact_phone_number' => 'required|max:255',
-                'event_id' => 'required|integer|exists:events,id',
-                'school_id' => 'required|integer|exists:schools,id',
+                'student_email' => 'required|email|unique:students,student_email',
+                'residence_country' => 'required|string|max:255',
+                'city' => 'required|string|max:255',
+                'postal_code' => 'required|string|max:255',
+
+                'emergency_contact_full_name' => 'required|string|max:255',
+                'emergency_contact_relationship' => 'required|string|max:255',
+                'emergency_contact_email' => 'required|email|max:255',
+                'emergency_contact_phone_number' => 'required|string|max:255',
             ]);
 
             // Crear un nuevo estudiante en la base de datos y asociarlo con el usuario en sesión
@@ -105,9 +125,7 @@ class StudentController extends Controller
             $user = auth()->user();
             
             // Obtenemos los estudiantes del usuario en sesión
-            $students = $user->students;
-
-
+            $students = Student::with('events.program')->where('parents_id', '=', $user->familyparents->id)->get(['id','first_name','last_name']);
 
             $response = [
                 'data' => $students,
@@ -178,22 +196,21 @@ class StudentController extends Controller
 
             // Validar los datos de entrada
             $validator = $request->validate([
-                'first_name' => 'string|max:255',
-                'last_name' => 'string|max:255',
-                'birthdate' => 'date',
-                'nationality' => 'string|max:255',
-                'passport' => 'string|max:255',
-                'valid_visa' => 'string|max:255',
-                'end_of_validity' => 'date',
-                'student_email' => 'string|email|unique:students',
-                'residence_country' => 'string|max:255',
-                'city' => 'string|max:255',
-                'postal_code' => 'integer',
-                'emergency_contact_full_name' => 'string|max:255',
-                'emergency_contact_relationship' => 'string|max:255',
-                'emergency_contact_email' => 'string|email',
-                'emergency_contact_phone_number' => 'string|max:255',
-                'parents_id' => 'integer|exists:familyparents,id',
+                'first_name' => 'required|string|max:255',
+                'last_name' => 'required|string|max:255',
+                'birthdate' => 'required|date',
+                'nationality' => 'required|string|max:255',
+                'passport' => 'required|string|max:255',
+                'valid_visa' => 'required|boolean',
+                'end_of_validity' => 'required|date',
+                'student_email' => 'required|string|email',
+                'residence_country' => 'required|string|max:255',
+                'city' => 'required|string|max:255',
+                'postal_code' => 'required|numeric',
+                'emergency_contact_full_name' => 'required|string|max:255',
+                'emergency_contact_relationship' => 'required|string|max:255',
+                'emergency_contact_email' => 'required|string|email',
+                'emergency_contact_phone_number' => 'required|string|max:255',
             ]);
 
             // Actualizar los datos del estudiante con los nuevos datos
@@ -215,5 +232,119 @@ class StudentController extends Controller
             return response($response, 500);
         }
     }
+
+    public function deleteStudentById($id)
+    {
+        try {
+            // Buscar el estudiante por su id
+            $student = Student::find($id);
+
+            if (!$student) {
+                $response = [
+                    'data' => null,
+                    'message' => 'student not found',
+                    'staus_code' => 404,
+                ];
+
+                return response($response, 404);
+            }
+
+            $student->delete();
+
+            $response = [
+                'data' => $id,
+                'message' => 'student deleted successfully',
+                'staus_code' => 200,
+            ];
+
+            return response($response, 200);
+        } catch (QueryException $exception) {
+            $response = [
+                'message' => 'An error occurred while deleting the student',
+                'error' => $exception->getMessage(),
+                'staus_code' => 500,
+            ];
+
+            return response($response, 500);
+        }
+    }
+
+    public function assigningAstudenttoAuser(Request $request) {
+        $data = json_decode($request->getContent(), true);
+        $request = new Request($data);
+    try {
+
+        $fields = $request->validate([
+            'school_id' => 'required|numeric|exists:schools,id',
+            'event_id' => 'required|numeric|exists:events,id',
+
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'birthdate' => 'required|date',
+            'nationality' => 'required|string|max:255',
+            'passport' => 'required|string|max:255|unique:students,passport',
+            'valid_visa' => 'required|boolean',
+            'end_of_validity' => 'required|date',
+            'student_email' => 'required|email|unique:students,student_email',
+            'residence_country' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'postal_code' => 'required|string|max:255',
+
+            'emergency_contact_full_name' => 'required|string|max:255',
+            'emergency_contact_relationship' => 'required|string|max:255',
+            'emergency_contact_email' => 'required|email|max:255',
+            'emergency_contact_phone_number' => 'required|string|max:255',
+            'family_parents_id' => 'required|exists:familyparents,id',
+        ]);
+    
+        // Crear los modelos correspondientes
+  
+        
+        $student = Student::create([
+            'first_name' => $fields['first_name'],
+            'last_name' => $fields['last_name'],
+            'birthdate' => $fields['birthdate'],
+            'nationality' => $fields['nationality'],
+            'passport' => $fields['passport'],
+            'valid_visa' => $fields['valid_visa'],
+            'end_of_validity' => $fields['end_of_validity'],
+            'student_email' => $fields['student_email'],
+            'residence_country' => $fields['residence_country'],
+            'city' => $fields['city'],
+            'postal_code' => $fields['postal_code'],
+            'emergency_contact_full_name' => $fields['emergency_contact_full_name'],
+            'emergency_contact_relationship' => $fields['emergency_contact_relationship'],
+            'emergency_contact_email' => $fields['emergency_contact_email'],
+            'emergency_contact_phone_number' => $fields['emergency_contact_phone_number'],
+            'parents_id' => $fields['family_parents_id'] //asociando el estudiante a los padres
+        ]);
+
+
+        // Asociar el estudiante con la escuela correspondiente
+        $schoolHasStudent = new SchoolHasStudent;
+        $schoolHasStudent->school_id = $fields['school_id'];
+        $schoolHasStudent->student_id = $student->id;
+        $schoolHasStudent->event_id = $fields['event_id'];
+        $schoolHasStudent->save();
+
+        // Retornamos una respuesta con los datos del usuario creado
+
+        $response = [
+            'data' => $student,
+            'message' => 'Estudiante creado exitosamente.'
+        ];
+
+        return response($response, 201);
+
+    } catch (QueryException $exception) {
+        $response = [
+            'message' => "Ha ocurrido un error al registrarse",
+            'error' => $exception->getMessage(),
+            // 'code' => 500
+        ];
+
+        return response($response , 500);
+    }
+}
 
 }

@@ -15,6 +15,7 @@ return new class extends Migration
     {
         Schema::create('events', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
             $table->dateTime('start_date');
             $table->dateTime('end_date');
             $table->dateTime('payment_limit');

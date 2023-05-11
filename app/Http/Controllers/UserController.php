@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function showUserAndParentsInfo()
+    public function showAllUserAndParentsInfo()
     {
         try {
             $users = User::with('familyparents')->get();
@@ -18,6 +18,28 @@ class UserController extends Controller
             $response = [
                 'data' => $users,
                 'message' => 'users and family parents shown successfully',
+                'status_code' => 200,
+            ];
+
+            return response($response, 200);
+        } catch (QueryException $exception) {
+            $response = [
+                'message' => 'An error occurred while fetching the users and family parents',
+                'error' => $exception->getMessage(),
+                'status_code' => 500,
+            ];
+
+            return response($response, 500);
+        }
+    }
+    public function showUserLoggedParentsInfo()
+    {
+        try {
+            $user = auth()->user();
+
+            $response = [
+                'data' => $user->familyparents,
+                'message' => 'family parents shown successfully',
                 'status_code' => 200,
             ];
 
@@ -40,10 +62,10 @@ class UserController extends Controller
                 
                 'mothers_name' => 'required|string|max:255',
                 'mothers_phone' => 'required|string|max:255',
-                'mothers_email' => 'required|string|email|unique:familyparents,mothers_email',
+                'mothers_email' => 'required|string|email',
                 'fathers_name' => 'required|string|max:255',
                 'fathers_phone' => 'required|string|max:255',
-                'fathers_email' => 'required|string|email|unique:familyparents,fathers_email',
+                'fathers_email' => 'required|string|email',
             ]);
 
             $user = User::find($id);
@@ -61,9 +83,9 @@ class UserController extends Controller
             $familyParents = FamilyParent::where('user_id', $id)->firstOrFail();
 
             // Actualizamos los valores del usuario
-            $user->email = $request->input('email', $user->email);
-            $user->password = $request->input('password', $user->password);
-            $user->save();
+            // $user->email = $request->input('email', $user->email);
+            // $user->password = $request->input('password', $user->password);
+            // $user->save();
 
             // Actualizamos los valores de los padres
             $familyParents->mothers_name = $request->input('mothers_name', $familyParents->mothers_name);
@@ -75,8 +97,10 @@ class UserController extends Controller
             $familyParents->fathers_email = $request->input('fathers_email', $familyParents->fathers_email);
             $familyParents->save();
 
+            $familyParents = FamilyParent::where('user_id', $id)->firstOrFail();
+
             $response = [
-                'data' => $user,
+                'data' => $familyParents,
                 'message' => 'User and family parents edited successfully',
                 'status_code' => 200,
             ];

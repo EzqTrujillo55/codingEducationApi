@@ -24,4 +24,9 @@ class School extends Model
                     ->withPivot('entry_year', 'exit_year');
     }
 
+    public function events()
+    {
+        return $this->hasManyThrough(Event::class, SchoolHasEvent::class, 'school_id', 'id', 'id', 'event_id');
+    }
+
 }

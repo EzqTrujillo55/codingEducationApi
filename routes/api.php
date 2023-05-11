@@ -51,12 +51,16 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // Event routes
     // Create event
     Route::post('/create-event', [EventController::class, 'createEvent']);
+
     // Delete Event
     Route::delete('/delete-event/{id}', [EventController::class, 'deleteEvent']);
+
     // Show all events
     Route::get('/show-all-events', [EventController::class, 'showAllEvents']);
+
     // Show event by id
     Route::get('/show-event/{id}', [EventController::class, 'showEventById']);
+    
     // Edit event
     Route::put('/edit-event/{id}', [EventController::class, 'editEvent']);
 });
@@ -75,7 +79,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/edit-school-representative/{id}', [SchoolController::class, 'editSchoolAndRepresentativeBySchoolId']);
     // Show all school and events
     Route::get('/show-all-school-events/{id}', [SchoolController::class, 'showAllSchoolsWithEvents']);
-    // Assign event to school  payment
+    // Assign event to school 
     Route::post('/assign-event-to-school', [SchoolHasEventController::class, 'assignEvent']);
 });
 
@@ -84,7 +88,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // Payment routes
     // Create payment
     Route::post('/create-payment', [PaymentController::class, 'createPayment']);
-    // Show payment
+    // Show payments
     Route::get('/show-all-payment/student/{student_id}/event/{event_id}', [PaymentController::class, 'showAllPaymentsByStudentAndEvent']);
     // Show all payments to admin
     Route::get('/show-all-payments-to-admin', [PaymentController::class, 'showAllPaymentsToAdmin']);
@@ -94,20 +98,33 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 Route::group(['middleware' => 'auth:sanctum'], function () {
     // User routes
     // Show user and parents info
-    Route::get('/show-user-parents-info', [UserController::class, 'showUserAndParentsInfo']);
+    Route::get('/show-all-user-parents-info', [UserController::class, 'showAllUserAndParentsInfo']);
+    Route::get('/show-user-logged-parents-info', [UserController::class, 'showUserLoggedParentsInfo']);
     // Edit user and parents info
-    Route::put('/edit-user-parents-info/{id}', [UserController::class, 'editUserAndParentsInfo']);
+    Route::patch('/edit-user-parents-info/{id}', [UserController::class, 'editUserAndParentsInfo']);
 });
 
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     // Student routes
+    // Show all students
+    Route::get('/show-all-students', [StudentController::class, 'showStudents']);
+
     // Show all students logged
     Route::get('/show-students-logged', [StudentController::class, 'showStudentsByUserLogged']);
+
     // Create new student and event with user logged info
     Route::post('/create-student-with-event', [StudentController::class, 'createNewStudentAndEventWithUserLoggedInfo']);
+
+    // Create new student and assign to a exist acount
+    Route::post('/create-student-assign-to-user', [StudentController::class, 'assigningAstudenttoAuser']);
+
     // Show students by id for current user logged
     Route::get('/show-students-current-user-looged/{id}', [StudentController::class, 'showStudentById']);
+
     // Edit students by id for current user logged
-    Route::put('/edit-students-current-user-looged/{id}', [StudentController::class, 'editStudentById']);
+    Route::patch('/edit-students-current-user-looged/{id}', [StudentController::class, 'editStudentById']);
+
+    // Edit students by id for current user logged
+    Route::delete('/delete-student/{id}', [StudentController::class, 'deleteStudentById']);
 });

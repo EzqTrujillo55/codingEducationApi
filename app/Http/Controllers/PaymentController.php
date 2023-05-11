@@ -56,15 +56,20 @@ class PaymentController extends Controller
         try {
             // Obtener el usuario autenticado y su padre de familia
             $user = Auth::user();
-            $familyParent = $user->familyParents;
+            // $familyParent = $user->familyParents;
 
             // Obtener los estudiantes asociados al padre de familia
-            $students = $familyParent->students;
+            // $students = $familyParent->students;
             
             // Obtener los pagos correspondientes al evento indicado para el estudiante especificado
-            $payments = Payment::whereIn('student_id', $students->pluck('id')->toArray())
-                            ->where('event_id', $event_id)
-                            ->where('student_id', $student_id)
+            // $payments = Payment::whereIn('student_id', $students->pluck('id')->toArray())
+            //                 ->where('event_id', $event_id)
+            //                 ->where('student_id', $student_id)
+            //                 ->get();
+            error_log($user->id);
+            $payments = Payment::where('user_id', '=', $user->id)
+                            ->where('event_id', '=', $event_id)
+                            ->where('student_id', '=', $student_id)
                             ->get();
 
             $response = [

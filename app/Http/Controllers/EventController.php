@@ -21,6 +21,7 @@ class EventController extends Controller
         try {
             // Validación de los datos de entrada
             $request->validate([
+                'name' => 'required|string',
                 'start_date' => 'required|date',
                 'end_date' => 'required|date',
                 'payment_limit' => 'required|date',
@@ -32,6 +33,7 @@ class EventController extends Controller
 
             // Creación de un nuevo evento en la base de datos
             $event = new Event();
+            $event->name = $request->name;
             $event->start_date = $request->start_date;
             $event->end_date = $request->end_date;
             $event->payment_limit = $request->payment_limit;

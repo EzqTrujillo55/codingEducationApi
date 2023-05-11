@@ -6,6 +6,7 @@ use App\Models\School;
 use App\Models\Representative;
 use App\Models\SchoolHasEvent;
 use Illuminate\Http\Request;
+use Illuminate\Http\Controllers\SchoolHasEventController;
 
 
 class SchoolController extends Controller
@@ -25,10 +26,11 @@ class SchoolController extends Controller
         try {
             // Validación de los datos de entrada
             $request->validate([
-                'name' => 'required|max:255',
-                'country' => 'required',
-                'full_name' => 'required|max:255',
-                'phone' => 'required',
+                'name' => 'required|string|max:255',
+                'country' => 'required|string|max:255',
+                'full_name' => 'required|string|max:255',
+                'phone' => 'required|string|max:255',
+                'event_id' => 'required|exists:events,id',
             ]);
 
             // Creación de un nuevo representante en la base de datos
@@ -43,6 +45,11 @@ class SchoolController extends Controller
             $school->country = $request->country;
             $school->representative_id = $representative->id;
             $school->save();
+
+            SchoolHasEvent::create([
+                'school_id' =>  $school->id,
+                'event_id' => $request['event_id'],
+            ]);
 
             $response = [
                 'data' => $school,
@@ -104,7 +111,7 @@ class SchoolController extends Controller
     public function showAllSchoolAndRepresentative()
     {
         try {
-            $schools = School::with('representative')->get();
+            $schools = School::with(['events','representative'])->get();
 
             $response = [
                 'data' => $schools,

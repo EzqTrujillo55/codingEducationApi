@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('student_email')->unique();
             $table->string('residence_country');
             $table->string('city');
-            $table->integer('postal_code');
+            $table->string('postal_code');
             $table->string('emergency_contact_full_name');
             $table->string('emergency_contact_relationship');
             $table->string('emergency_contact_email');
