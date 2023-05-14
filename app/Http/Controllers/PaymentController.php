@@ -10,35 +10,59 @@ use App\Http\Requests\UpdatePaymentRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+use Stripe\Stripe;
+use Stripe\PaymentIntent;
+
 class PaymentController extends Controller
 {
    
     public function createPayment(Request $request)
     {
         try {
+            
 
             $validatedData = $request->validate([
-                'invoice' => 'required|string',
+                // 'invoice' => 'required|string',
                 'amount' => 'required|integer',
                 'event_id' => 'required|exists:events,id',
                 'student_id' => 'required|exists:students,id',
             ]);
 
-            $payment = Payment::create([
-                'user_id' => auth()->user()->id,
-                'invoice' => $validatedData['invoice'],
+            $key_secret = env('SECRET_KEY_STRIPE');
+            Stripe::setApiKey($key_secret);
+            
+            $paymentIntent = PaymentIntent::create([
                 'amount' => $validatedData['amount'],
-                'event_id' => $validatedData['event_id'],
-                'student_id' => $validatedData['student_id'],
+                'currency' => 'USD',
             ]);
 
+            //SUCCESS
+            if($paymentIntent){
+                $payment = Payment::create([
+                    'user_id' => auth()->user()->id,
+                    // 'invoice' => $validatedData['invoice'],
+                    'invoice' => $paymentIntent->id,
+                    'amount' => $validatedData['amount'],
+                    'event_id' => $validatedData['event_id'],
+                    'student_id' => $validatedData['student_id'],
+                ]);
+
+                $response = [
+                    'data' => $payment,
+                    'message' => 'payment created successfully',
+                    'status_code' => 201,
+                ];
+    
+                return response($response, 201);
+            }
+
             $response = [
-                'data' => $payment,
-                'message' => 'payment created successfully',
-                'status_code' => 201,
+                'data' => null,
+                'message' => 'payment error',
+                'status_code' => 400,
             ];
 
-            return response($response, 201);
+            return response($response, 400);
 
         } catch (QueryException $exception) {
             $response = [
@@ -94,7 +118,7 @@ class PaymentController extends Controller
     public function showAllPaymentsToAdmin()
     {
         try {
-            $payments = Payment::with(['user.familyParents.students'])->get();
+            $payments = Payment::with(['user.familyParents', 'student'])->get();
             
             $response = [
                 'data' => $payments,

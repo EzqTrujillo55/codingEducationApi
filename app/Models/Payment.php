@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Event;
 use App\Models\User;
+use App\Models\Student;
 
 class Payment extends Model
 {
@@ -27,5 +28,9 @@ class Payment extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+    public function student()
+    {
+        return $this->hasOne(Student::class, 'id', 'student_id');
     }
 }

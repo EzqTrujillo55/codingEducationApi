@@ -10,6 +10,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\SchoolHasEventController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\CheckoutController;
 
 
 
@@ -30,6 +31,7 @@ use App\Http\Controllers\StudentController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+// Route::get('/checkout', [CheckoutController::class, 'createCheckoutSession']);
 
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
