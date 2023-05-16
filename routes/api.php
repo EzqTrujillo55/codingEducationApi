@@ -33,6 +33,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 // Route::get('/checkout', [CheckoutController::class, 'createCheckoutSession']);
 
+// Show all school and representative
+Route::get('/show-all-school-representative', [SchoolController::class, 'showAllSchoolAndRepresentative']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     // Program routes
@@ -73,8 +75,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::post('/create-school-representative', [SchoolController::class, 'createSchoolAndRepresentative']);
     // Delete school and representative
     Route::delete('/delete-school-representative/{id}', [SchoolController::class, 'deleteSchoolAndRepresentativeBySchoolId']);
-    // Show all school and representative
-    Route::get('/show-all-school-representative', [SchoolController::class, 'showAllSchoolAndRepresentative']);
     // Show school and representative by school id
     Route::get('/show-school-representative/{id}', [SchoolController::class, 'showSchoolAndRepresentativeBySchoolId']);
     // Edit school and representative

@@ -22,7 +22,7 @@ class Payment extends Model
     
     public function event()
     {
-        return $this->belongsTo(Event::class);
+        return $this->hasOne(Event::class, 'id', 'event_id');
     }
 
     public function user()
@@ -33,4 +33,5 @@ class Payment extends Model
     {
         return $this->hasOne(Student::class, 'id', 'student_id');
     }
+   
 }

@@ -118,7 +118,7 @@ class PaymentController extends Controller
     public function showAllPaymentsToAdmin()
     {
         try {
-            $payments = Payment::with(['user.familyParents', 'student'])->get();
+            $payments = Payment::with(['user.familyParents', 'student', 'event.school'])->get();
             
             $response = [
                 'data' => $payments,
