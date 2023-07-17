@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Faker\Factory as Faker;
+use App\Models\User;
+
 
 class DatabaseSeeder extends Seeder
 {
@@ -20,5 +23,15 @@ class DatabaseSeeder extends Seeder
         //     'name' => 'Test User',
         //     'email' => 'test@example.com',
         // ]);
+        
+        $faker = Faker::create();
+
+        for ($i = 0; $i < 10; $i++) {
+            User::create([
+                'email' => $faker->unique()->safeEmail,
+                'password' => bcrypt('password123'),
+            ]);
+        }
+
     }
 }
