@@ -64,3 +64,25 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Nuestra documentación 
+
+Pasos para levantar el api localmente
+
+1. Crear un archivo .env con el mismo contenido del env.example, se debe cambiar los datos para la conexión a la DB
+2. Dentro del archivo app/Providers/AuthServiceProvider.php , comentar todo el contenido de la función boot
+3. Ejecutar php artisan migrate, esto creará las tabls en la base de datos
+4. Descomentar el código comentado en el paso 2
+5. Ejecutar php artisan key:generate, en el .env se generará una clave en la variable APP_KEY
+6. Ejecutar composer install, esto instalará las dependencias del api
+7. Ejecutar php artisan serve
+8. Acceder a la url que presenta el comando php artisan serve
+
+Super recomendado, ejecutar los seeders para pruebas locales, este es el orden: 
+php artisan db:seed --class=RepresentativeSeeder
+php artisan db:seed --class=DatabaseSeeder
+php artisan db:seed --class=FamilyparentSeeder
+php artisan db:seed --class=StudentSeeder
+php artisan db:seed --class=ProgramSeeder
+php artisan db:seed --class=EventSeeder
+php artisan db:seed --class=PaymentSeeder
