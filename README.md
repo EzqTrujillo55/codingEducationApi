@@ -79,10 +79,10 @@ Pasos para levantar el api localmente
 8. Acceder a la url que presenta el comando php artisan serve
 
 Super recomendado, ejecutar los seeders para pruebas locales, este es el orden: 
-php artisan db:seed --class=RepresentativeSeeder
-php artisan db:seed --class=DatabaseSeeder
-php artisan db:seed --class=FamilyparentSeeder
-php artisan db:seed --class=StudentSeeder
-php artisan db:seed --class=ProgramSeeder
-php artisan db:seed --class=EventSeeder
-php artisan db:seed --class=PaymentSeeder
+1. php artisan db:seed --class=RepresentativeSeeder
+2. php artisan db:seed --class=DatabaseSeeder
+3. php artisan db:seed --class=FamilyparentSeeder
+4. php artisan db:seed --class=StudentSeeder
+5. php artisan db:seed --class=ProgramSeeder
+6. php artisan db:seed --class=EventSeeder
+7. php artisan db:seed --class=PaymentSeeder
