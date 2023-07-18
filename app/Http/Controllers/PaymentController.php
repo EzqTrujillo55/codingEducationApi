@@ -139,4 +139,28 @@ class PaymentController extends Controller
         }
     }
 
+
+
+    public function showAllPaymentsByUser($userId)
+    {
+        try {
+            $payments = Payment::where('user_id', '=', $userId)->get();
+            $response = [
+                'data' => $payments,
+                'message' => 'Payments shown successfully',
+                'status_code' => 200,
+            ];
+
+            return response($response, 200);
+
+        } catch (QueryException $exception) {
+            $response = [
+                'message' => 'An error occurred while trying to retrieve the payments',
+                'error' => $exception->getMessage(),
+                'status_code' => 500,
+            ];
+            return response($response, 500);
+        }
+    }
+
 }

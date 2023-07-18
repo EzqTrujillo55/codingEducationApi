@@ -94,6 +94,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/show-all-payment/student/{student_id}/event/{event_id}', [PaymentController::class, 'showAllPaymentsByStudentAndEvent']);
     // Show all payments to admin
     Route::get('/show-all-payments-to-admin', [PaymentController::class, 'showAllPaymentsToAdmin']);
+
+    Route::get('/show-all-payment/user/{userId}', [PaymentController::class, 'showAllPaymentsByUser']); 
 });
 
 
