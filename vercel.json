@@ -21,9 +21,11 @@
         "LOG_CHANNEL": "stderr",
         "SESSION_DRIVER": "cookie"
     },
-    "commands": {
-        "pre": [
-          "php artisan migrate" 
-        ]
+    "build": {
+        "commands": {
+            "pre": [
+                "php artisan migrate" 
+            ]
+        }
     }
 }
