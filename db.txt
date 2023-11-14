@@ -1,0 +1,7 @@
+SERVICE URI: mysql://avnadmin:AVNS_xfpgib4uw5ZQQvs35Zw@edu-db-edu-db.a.aivencloud.com:17023/defaultdb?ssl-mode=REQUIRED
+DATABASE NAME: defaultdb
+HOST: edu-db-edu-db.a.aivencloud.com
+PORT: 17023
+USER: avnadmin
+PASSWORD: AVNS_xfpgib4uw5ZQQvs35Zw
+SSL MODE: REQUIRED
