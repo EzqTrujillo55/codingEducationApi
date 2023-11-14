@@ -204,5 +204,34 @@ class EventController extends Controller
             return response($response, 500);
         }
     }
+
+
+    public function getStudentsByEventId($eventId)
+    {
+        // Obtén el evento con el ID proporcionado
+        $event = Event::find($eventId);
+
+        if (!$event) {
+            // Manejo si el evento no se encuentra
+            $response = [
+                'error' => 'Evento no encontrado',
+                'status_code' => 404,
+            ];
+            return response($response, 404);
+        }
+
+        // Obtén todos los estudiantes relacionados con el evento
+        $students = $event->students;
+
+        // Ahora, $students contendrá la colección de estudiantes relacionados con el evento
+
+        $response = [
+            'data' => $students,
+            'message' => 'Students of event shown successfully',
+            'status_code' => 200,
+        ];
+
+        return response($response, 200);
+    }
     
 }

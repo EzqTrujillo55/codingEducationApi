@@ -37,7 +37,7 @@ class ProgramController extends Controller
             $response = [
                 'data' => $program,
                 'message' => 'Program created succefully',
-                'staus_code' => 201,
+                'status_code' => 201,
             ];
 
             return response($response, 201);
@@ -45,7 +45,7 @@ class ProgramController extends Controller
             $response = [
                 'message' => 'Ha ocurrido un error al intentar iniciar sesion',
                 'error' => $exception->getMessage(),
-                'staus_code' => 500,
+                'status_code' => 500,
             ];
 
             return response($response, 500);

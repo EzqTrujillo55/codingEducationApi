@@ -30,7 +30,7 @@ class SchoolController extends Controller
                 'country' => 'required|string|max:255',
                 'full_name' => 'required|string|max:255',
                 'phone' => 'required|string|max:255',
-                'event_id' => 'required|exists:events,id',
+                //'event_id' => 'required|exists:events,id',
             ]);
 
             // Creación de un nuevo representante en la base de datos
@@ -46,10 +46,10 @@ class SchoolController extends Controller
             $school->representative_id = $representative->id;
             $school->save();
 
-            SchoolHasEvent::create([
+            /*SchoolHasEvent::create([
                 'school_id' =>  $school->id,
                 'event_id' => $request['event_id'],
-            ]);
+            ]);*/
 
             $response = [
                 'data' => $school,
@@ -111,7 +111,7 @@ class SchoolController extends Controller
     public function showAllSchoolAndRepresentative()
     {
         try {
-            $schools = School::with(['events','representative'])->get();
+            $schools = School::with(['events','representative', 'students'])->get();
 
             $response = [
                 'data' => $schools,
@@ -233,6 +233,39 @@ class SchoolController extends Controller
         } catch (QueryException $exception) {
             $response = [
                 'message' => 'An error occurred while fetching the schools with events',
+                'error' => $exception->getMessage(),
+                'status_code' => 500,
+            ];
+
+            return response($response, 500);
+        }
+    }
+
+
+    public function showAllSchoolWithStudents($id)
+    {
+        try {
+            $school = School::with(['students'])->find($id);
+
+            if(!$school){
+                $response = [
+                    'data' => null,
+                    'message' => 'The school with the ID '.$id.' could not be found.',
+                    'status_code' => 404,
+                ];
+                return response($response, 404);
+            }
+
+            $response = [
+                'data' => $school,
+                'message' => 'Schools and students shown successfully',
+                'status_code' => 200,
+            ];
+
+            return response($response, 200);
+        } catch (QueryException $exception) {
+            $response = [
+                'message' => 'An error occurred while fetching the schools and representatives',
                 'error' => $exception->getMessage(),
                 'status_code' => 500,
             ];

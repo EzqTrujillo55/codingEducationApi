@@ -20,8 +20,7 @@ class School extends Model
 
     public function students()
     {
-        return $this->belongsToMany(Student::class, 'school_has_students')
-                    ->withPivot('entry_year', 'exit_year');
+        return $this->belongsToMany(Student::class, 'school_has_students');                    
     }
 
     public function events()

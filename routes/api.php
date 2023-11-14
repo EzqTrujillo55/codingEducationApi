@@ -11,6 +11,7 @@ use App\Http\Controllers\SchoolHasEventController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\SchoolHasProgramController;
 
 
 
@@ -67,6 +68,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     
     // Edit event
     Route::put('/edit-event/{id}', [EventController::class, 'editEvent']);
+
+    Route::get('/events/{eventId}/students', [EventController::class, 'getStudentsByEventId']);
+
 });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
@@ -81,6 +85,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/edit-school-representative/{id}', [SchoolController::class, 'editSchoolAndRepresentativeBySchoolId']);
     // Show all school and events
     Route::get('/show-all-school-events/{id}', [SchoolController::class, 'showAllSchoolsWithEvents']);
+
+    Route::get('/show-all-school-students/{id}', [SchoolController::class, 'showAllSchoolWithStudents']);
+
     // Assign event to school 
     Route::post('/assign-event-to-school', [SchoolHasEventController::class, 'assignEvent']);
 });
@@ -131,4 +138,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     // Edit students by id for current user logged
     Route::delete('/delete-student/{id}', [StudentController::class, 'deleteStudentById']);
+});
+
+
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    // Assign program to school 
+    Route::post('/assign-program-to-school', [SchoolHasProgramController::class, 'assignProgram']);
 });
