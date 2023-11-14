@@ -27,24 +27,4 @@ class Event extends Model
     {
         return $this->hasOneThrough(School::class, SchoolHasEvent::class, 'event_id', 'id', 'id', 'school_id');
     }
-
-    // chat gpt example
-    // class Mechanic extends Model
-    // {
-    //     /**
-    //      * Get the car's owner.
-    //      */
-    //     public function carOwner(): HasOneThrough
-    //     {
-    //         return $this->hasOneThrough(
-    //             Owner::class,
-    //             Car::class,
-    //             'mechanic_id', // Foreign key on the cars table...
-    //             'car_id', // Foreign key on the owners table...
-    //             'id', // Local key on the mechanics table...
-    //             'id' // Local key on the cars table...
-    //         );
-    //     }
-    // }
-
 }
