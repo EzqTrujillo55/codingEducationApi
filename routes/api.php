@@ -12,6 +12,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\SchoolHasProgramController;
+use App\Http\Controllers\ResetPasswordController;
 
 
 
@@ -32,6 +33,7 @@ use App\Http\Controllers\SchoolHasProgramController;
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+
 // Route::get('/checkout', [CheckoutController::class, 'createCheckoutSession']);
 
 // Show all school and representative
@@ -108,6 +110,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     // User routes
+    Route::put('update-role-user/{id}', [UserController::class, 'updateRoleUser' ]);
     // Show user and parents info
     Route::get('/show-all-user-parents-info', [UserController::class, 'showAllUserAndParentsInfo']);
     Route::get('/show-user-logged-parents-info', [UserController::class, 'showUserLoggedParentsInfo']);
@@ -144,4 +147,16 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 Route::group(['middleware' => 'auth:sanctum'], function () {
     // Assign program to school 
     Route::post('/assign-program-to-school', [SchoolHasProgramController::class, 'assignProgram']);
+
+    Route::post('/registerAdmin', [AuthController::class, 'registerAdmin']);
+
+    Route::post('/deleteUsers', [UserController::class, 'deleteUsers']);
+
+    Route::post('/sendRecoverEmail', [UserController::class, 'sendRecoverEmail']);
+
 });
+
+Route::post('/sendRecoverEmail', [ResetPasswordController::class, 'sendRecoverEmail']);
+
+Route::post('/forgot-password', [ResetPasswordController::class, 'sendResetLinkEmail']);
+Route::post('/reset-password', [ResetPasswordController::class, 'reset']);

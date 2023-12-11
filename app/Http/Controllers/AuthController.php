@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use \Illuminate\Database\QueryException;
 use App\Models\User;
 use App\Models\Student;
-use App\Models\FamilyParent;
+use App\Models\Familyparent;
 use App\Models\SchoolHasStudent;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -63,6 +63,9 @@ class AuthController extends Controller
             $request = new Request($data);
         try {
 
+            error_log('Aca estoiy;');
+            error_log('Aca estoiy2;');
+            
             $fields = $request->validate([
                 'school_id' => 'required|numeric|exists:schools,id',
                 'event_id' => 'required|numeric|exists:events,id',
@@ -94,20 +97,29 @@ class AuthController extends Controller
                 'email' => 'required|email|unique:users,email',
                 'password' => 'required|string|min:8'
             ]);
-        
+
+
+            error_log('Aca estoiy2;');
+            
             // Crear los modelos correspondientes
             $user = User::create([
                 'email' => $fields['email'],
                 'password' => bcrypt($fields['password']),
             ]);
 
+
+            error_log('Aca estoiy3;');
+            
             $role = Role::where('name', 'Tutor')->first();
             $user->assignRole($role);
             $permissions = Permission::whereIn('name', ['create_student', 'edit_student'])->get();
             $user->givePermissionTo($permissions);
             
 
-            $familyParents = FamilyParent::create([
+
+            error_log('Aca estoiy4;');
+            
+            $familyParents = Familyparent::create([
                 'mothers_name' => $fields['mothers_name'],
                 'mothers_phone' => $fields['mothers_phone'],
                 'mothers_email' => $fields['mothers_email'],
@@ -117,6 +129,8 @@ class AuthController extends Controller
                 'user_id' => $user->id, //asociando el usuario a los padres
             ]);
 
+            error_log('Aca estoiy5;');
+            
             $student = Student::create([
                 'first_name' => $fields['first_name'],
                 'last_name' => $fields['last_name'],
@@ -137,6 +151,9 @@ class AuthController extends Controller
             ]);
 
 
+
+            error_log('Aca estoiy6;');
+            
             // Asociar el estudiante con la escuela correspondiente
             $schoolHasStudent = new SchoolHasStudent;
             $schoolHasStudent->school_id = $fields['school_id'];
@@ -146,6 +163,8 @@ class AuthController extends Controller
 
             // Retornamos una respuesta con los datos del usuario creado
 
+            error_log('Aca estoiy7;');
+            
             $response = [
                 'data' => $user,
                 'message' => 'Usuario creado exitosamente.'
@@ -161,7 +180,63 @@ class AuthController extends Controller
             ];
 
             return response($response , 500);
+        } catch (\Exception $e) {
+            $response = [
+                'message' => "Ha ocurrido un error al registrarse",
+                'error' => $e->getMessage(),
+                'code' => 500
+            ];
+
+            return response($response , 500);
         }
     }
+
+
+    public function registerAdmin(Request $request) {
+        $data = json_decode($request->getContent(), true);
+        $request = new Request($data);
+    try {
+
+        
+        $fields = $request->validate([
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8'
+        ]);
+
+
+        
+        // Crear los modelos correspondientes
+        $user = User::create([
+            'email' => $fields['email'],
+            'password' => bcrypt($fields['password']),
+            'role' => 'ADMIN'
+        ]);
+
+        
+        $response = [
+            'data' => $user,
+            'message' => 'Admin creado exitosamente.'
+        ];
+
+        return response($response, 201);
+
+    } catch (QueryException $exception) {
+        $response = [
+            'message' => "Ha ocurrido un error al registrarse",
+            'error' => $exception->getMessage(),
+            // 'code' => 500
+        ];
+
+        return response($response , 500);
+    } catch (\Exception $e) {
+        $response = [
+            'message' => "Ha ocurrido un error al registrarse",
+            'error' => $e->getMessage(),
+            'code' => 500
+        ];
+
+        return response($response , 500);
+    }
+}
 
 }
