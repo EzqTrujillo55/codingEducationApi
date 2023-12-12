@@ -158,3 +158,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
 Route::post('/sendRecoverEmail', [ResetPasswordController::class, 'sendRecoverEmail']);
 Route::post('/resetPassword', [ResetPasswordController::class, 'resetPassword']);
+
+Route::get('/migrate', function(){
+    \Artisan::call('migrate');
+    dd('migrated!');
+});
