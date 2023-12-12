@@ -157,6 +157,4 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 });
 
 Route::post('/sendRecoverEmail', [ResetPasswordController::class, 'sendRecoverEmail']);
-
-Route::post('/forgot-password', [ResetPasswordController::class, 'sendResetLinkEmail']);
-Route::post('/reset-password', [ResetPasswordController::class, 'reset']);
+Route::post('/resetPassword', [ResetPasswordController::class, 'resetPassword']);

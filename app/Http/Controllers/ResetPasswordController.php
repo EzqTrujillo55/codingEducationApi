@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\PasswordReset;
 use Illuminate\Http\Request;
 
 use SendGrid\Mail\Mail;
@@ -39,17 +40,42 @@ class ResetPasswordController extends Controller
             return response($response, 404);
         }
 
+        
+
         $email = new Mail();
         $email->setFrom("codingeducationdev@gmail.com", "Coding Education");
         $email->addTo($user->email, $user->email);
         $email->setTemplateId("d-3ddeebd1675c48859d102c51e83aa4d2");
 
 
+        // Obtener un string de la hora actual
+        $timeString = date('YmdHis');
         $randomString = $this->generateRandomString(12);
-        $url = "http://localhost:5173/forgot-password/" . $randomString; 
+        $combinedString = $timeString . $randomString;
+
+        $localUrl = "http://localhost:5173/forgot-password/";
+        $remoteUrl = "https://codingeducationadmin.web.app/";
+
+        $url = $remoteUrl . $combinedString; 
         $datos = [
             'password' => $url,
         ];
+
+
+        $passwordReset = PasswordReset::where('email', $user->email)->first();
+
+        if ($passwordReset) {
+            $passwordReset->delete();
+            PasswordReset::create([
+                'email' => $user->email,
+                'token' => $combinedString,
+            ]); 
+        }else{
+            PasswordReset::create([
+                'email' => $user->email,
+                'token' => $combinedString,
+            ]);
+        }
 
         foreach ($datos as $key => $value) {
             $email->addDynamicTemplateData($key, $value);
@@ -60,12 +86,63 @@ class ResetPasswordController extends Controller
         try {
             $response = $sendgrid->send($email);
             if ($response->statusCode() == 202) {
-                return response()->json(['message' => 'Correo electrónico enviado con éxito']);
+                return response()->json(['message' => 'Correo electrónico enviado con éxito', 'status_code' => 200]);
             } else {
-                return response()->json(['message' => 'Error al enviar el correo electrónico'], 500);
+                return response()->json(['message' => 'Error al enviar el correo electrónico', 'status_code' => 500], 500);
             }
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error al enviar el correo electrónico: ' . $e->getMessage()], 500);
+        }
+
+    }
+
+
+    public function resetPassword(Request $request)
+    {
+        $newPass = $request->input('password', '');
+        $token = $request->input('token', '');
+        
+        // Buscar un registro por el campo 'token'
+        $passwordReset = PasswordReset::where('token', $token)->first();
+
+        if ($passwordReset) {
+
+            $user = User::where('email', $passwordReset->email)->first();
+        
+            if(!$user){
+                $response = [
+                    'data' => null,
+                    'message' => 'The user with the ID '.$userId.' could not be found.',
+                    'status_code' => 404,
+                ];
+
+                return response($response, 404);
+            }
+
+
+            $user->password = bcrypt($newPass);
+            $user->save();
+
+
+            $passwordReset->delete();
+
+            $response = [
+                'data' => null,
+                'message' => 'Usuario actualizado exitosamente',
+                'status_code' => 200,
+            ];
+           
+            return response($response, 200);            
+
+        } else {
+            $response = [
+                'data' => null,
+                'message' => 'Token inválido',
+                'status_code' => 400,
+            ];
+            
+            return response($response, 400);            
+
         }
 
     }
