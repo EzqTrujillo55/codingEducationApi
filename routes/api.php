@@ -161,7 +161,15 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 Route::post('/sendRecoverEmail', [ResetPasswordController::class, 'sendRecoverEmail']);
 Route::post('/resetPassword', [ResetPasswordController::class, 'resetPassword']);
 
-Route::get('/migrate', function(){
-    Artisan::call('migrate');
-    dd('migrated!');
+Route::get('/migrate', function () {
+    // Ejecutar el comando de migración directamente
+    \Illuminate\Support\Facades\Artisan::call('migrate');
+
+    // Verificar si hubo errores durante la migración
+    $output = \Illuminate\Support\Facades\Artisan::output();
+    if (str_contains($output, 'Migration table created successfully')) {
+        return 'Migración realizada con éxito';
+    } else {
+        return 'Error al ejecutar la migración';
+    }
 });
