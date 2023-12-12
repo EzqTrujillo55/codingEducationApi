@@ -56,7 +56,7 @@ class ResetPasswordController extends Controller
         $localUrl = "http://localhost:5173/forgot-password/";
         $remoteUrl = "https://codingeducationadmin.web.app/";
 
-        $url = $remoteUrl . $combinedString; 
+        $url = $localUrl . $combinedString; 
         $datos = [
             'password' => $url,
         ];

@@ -162,14 +162,6 @@ Route::post('/sendRecoverEmail', [ResetPasswordController::class, 'sendRecoverEm
 Route::post('/resetPassword', [ResetPasswordController::class, 'resetPassword']);
 
 Route::get('/migrate', function () {
-    // Ejecutar el comando de migración directamente
-    \Illuminate\Support\Facades\Artisan::call('migrate');
-
-    // Verificar si hubo errores durante la migración
-    $output = \Illuminate\Support\Facades\Artisan::output();
-    if (str_contains($output, 'Migration table created successfully')) {
-        return 'Migración realizada con éxito';
-    } else {
-        return 'Error al ejecutar la migración';
-    }
+    shell_exec('php artisan migrate');
+    dd('migrated!');
 });
