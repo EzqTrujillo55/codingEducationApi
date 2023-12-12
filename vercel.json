@@ -20,12 +20,5 @@
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
         "SESSION_DRIVER": "cookie"
-    },
-    "build": {
-        "commands": {
-            "pre": [
-                "php artisan migrate" 
-            ]
-        }
     }
 }
