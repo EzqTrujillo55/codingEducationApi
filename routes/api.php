@@ -162,6 +162,7 @@ Route::post('/sendRecoverEmail', [ResetPasswordController::class, 'sendRecoverEm
 Route::post('/resetPassword', [ResetPasswordController::class, 'resetPassword']);
 
 Route::get('/migrate', function () {
-    shell_exec('php artisan migrate');
+    defined('STDIN') or define('STDIN', fopen('php://stdin', 'r'));
+    Artisan::call('migrate');
     dd('migrated!');
 });
