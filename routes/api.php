@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\SchoolController;
@@ -160,6 +162,6 @@ Route::post('/sendRecoverEmail', [ResetPasswordController::class, 'sendRecoverEm
 Route::post('/resetPassword', [ResetPasswordController::class, 'resetPassword']);
 
 Route::get('/migrate', function(){
-    \Artisan::call('migrate');
+    Artisan::call('migrate');
     dd('migrated!');
 });
