@@ -166,3 +166,6 @@ Route::get('/migrate', function () {
     Artisan::call('migrate');
     dd('migrated!');
 });
+
+
+Route::post('/generate-pdf', [PaymentController::class, 'generatePDF']);
