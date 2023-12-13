@@ -22,6 +22,9 @@ use Stripe\PaymentIntent;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
+use Carbon\Carbon;
+
+
 class PaymentController extends Controller
 {
    
@@ -231,34 +234,40 @@ class PaymentController extends Controller
 
         $aaa = "https://codingeducation.us/wp-content/uploads/2022/08/logo_coding.png";
 
+        $formattedCreatedAt = Carbon::parse($data->created_at)->format('Y-m-d');
+
+
+        $formattedProgramCreatedAt = Carbon::parse($data->event['program']['created_at'])->format('Y-m-d');
+
+
         // Contenido HTML del PDF (puedes construirlo dinámicamente según tus necesidades)
         $html = '<html><body>';
         $html .= '<style>';
         $html .= '  h1 { color: red; text-align: center; }';
         $html .= '  p { font-size: 14px; }';
-        $html .= '  #top-bar { width: 100%; background-color: purple; text-align: center; color: white; font-size: 20px; padding-top: 8px; padding-bottom: 8px; font-weight: bolder; position: absolute; top: 0px }';
-        $html .= '  #logo-container { position: absolute; top: 50px; }';
+        $html .= '  #top-bar { width: 100%; background-color: #7404e8; text-align: center; color: white; font-size: 18px; padding-top: 8px; padding-bottom: 8px; font-weight: bolder; position: absolute; top: 0px }';
+        $html .= '  #logo-container { position: absolute; top: 60px; }';
         $html .= '  #address-container { position: absolute; top: 40px; right: 0px; }';
-        $html .= '  #title-container { text-align: center; position: absolute; top: 100px; left: 42%; font-weight: bolder; }';
-        $html .= '  #student-container { position: absolute; top: 140px; }';
-        $html .= '  #payer-container { position: absolute; top: 160px; }';
-        $html .= '  #receipt-container { right:120px; position: absolute; top: 140px; background-color: silver; border: 0.5 solid black; padding-left: 10px; padding-right: 30px; width: 80px;   }';
-        $html .= '  #date-container { right:120px; position: absolute; top: 165px; background-color: silver; border: 0.5 solid black; padding-left: 10px; padding-right: 30px; width: 80px; }';
-        $html .= '  #amount-container { right:120px; position: absolute; top: 190px; background-color: silver; border: 0.5 solid black; padding-left: 10px; padding-right: 30px; width: 80px; }';
+        $html .= '  #title-container { text-align: center; position: absolute; top: 150px; left: 42%; font-weight: bolder; }';
+        $html .= '  #student-container { position: absolute; top: 180px; }';
+        $html .= '  #payer-container { position: absolute; top: 200px; }';
+        $html .= '  #receipt-container { right:120px; position: absolute; top: 180px; background-color: #eeeeee; border: 0.5 solid black; padding-left: 10px; padding-right: 30px; width: 80px;   }';
+        $html .= '  #date-container { right:120px; position: absolute; top: 205px; background-color: #eeeeee; border: 0.5 solid black; padding-left: 10px; padding-right: 30px; width: 80px; }';
+        $html .= '  #amount-container { right:120px; position: absolute; top: 230px; background-color: #eeeeee; border: 0.5 solid black; padding-left: 10px; padding-right: 30px; width: 80px; }';
         
-        $html .= '  #receipt-value { position: absolute; top: 140px; right: 50px; }';
-        $html .= '  #date-value { position: absolute; top: 165px; right: 30px; }';
-        $html .= '  #amount-value { position: absolute; top: 190px; right: 35px; }';
+        $html .= '  #receipt-value { position: absolute; top: 180px; right: 35px; }';
+        $html .= '  #date-value { position: absolute; top: 205px; right: 30px; }';
+        $html .= '  #amount-value { position: absolute; top: 230px; right: 35px; }';
         
-        $html .= '  #table-container { position: absolute; top: 250px; width: 100%; }';
+        $html .= '  #table-container { position: absolute; top: 270px; width: 100%; }';
         
-        $html .= '  #aditional-container { position: absolute; top: 360px; }';
+        $html .= '  #aditional-container { position: absolute; top: 400px; }';
 
-        $html .= '  #total-container { position: absolute; top: 340px; right: 0px; }';
+        $html .= '  #total-container { position: absolute; top: 380px; right: 0px; }';
         
         $html .= '</style>';
         $html .= '<div id="top-bar">R E C E I P T</div>';
-        $html .= '<div id="logo-container"> <img src="' . $aaa . '" alt="Imagen" style="width: 200px; height: auto;"> </div>';
+        $html .= '<div id="logo-container"> <img src="' . $aaa . '" alt="Imagen" style="width: 300px; height: auto;"> </div>';
         $html .= '<div id="address-container"> <h3>ADDRESS DATA</h3> </div>';
         $html .= '<div id="title-container"> R E C I P I E N T </div>';
         $html .= '<div id="student-container">Student:' . $data->student['first_name'] . ' ' . $data->student['last_name'] . '</div>';
@@ -269,7 +278,7 @@ class PaymentController extends Controller
 
 
         $html .= '<div id="receipt-value">' . $data->invoice . '</div>';
-        $html .= '<div id="date-value">' . $data->created_at . '</div>';
+        $html .= '<div id="date-value">' . $formattedCreatedAt . '</div>';
         $html .= '<div id="amount-value">$' . $data->amount . ' USD</div>';
 
         
@@ -293,7 +302,7 @@ class PaymentController extends Controller
         $html .= '<div id="aditional-container"> 
         <div style="font-weight: bolder; font-size: 14px;" >ADDITIONAL NOTES</div> 
         <div>Program:' . $data->event['program']['name'] . '</div>
-        <div>Date:' . $data->event['program']['created_at'] . '</div>
+        <div>Date:' . $formattedProgramCreatedAt . '</div>
         <div>School:' . $data->event['school']['name']  .'</div>
         </div>';
 
@@ -301,15 +310,15 @@ class PaymentController extends Controller
             <table  style="border-spacing: 5px;
             border-collapse: separate;">
             <tr>
-                <td style="background-color: silver; padding-right: 80px; border: 0.5 solid black; padding-top: 8px; padding-bottom: 4px; padding-left: 8px;">Total</td>
+                <td style="background-color: #eeeeee; padding-right: 80px; border: 0.5 solid black; padding-top: 8px; padding-bottom: 4px; padding-left: 8px;">Total</td>
                 <td style="text-align: right" >$' . $data->event['price'] .'USD</td>
             </tr>
             <tr>
-                <td style="background-color: silver; padding-right: 80px; border: 0.5 solid black; padding-top: 8px; padding-bottom: 4px; padding-left: 8px;">Amount Paid</td>
+                <td style="background-color: #eeeeee; padding-right: 80px; border: 0.5 solid black; padding-top: 8px; padding-bottom: 4px; padding-left: 8px;">Amount Paid</td>
                 <td style="text-align: right" >$' . $data->amount . 'USD</td>
             </tr>
             <tr>
-                <td style="background-color: silver; padding-right: 80px; border: 0.5 solid black; padding-top: 8px; padding-bottom: 4px; padding-left: 8px;">Balance Due</td>
+                <td style="background-color: #eeeeee; padding-right: 80px; border: 0.5 solid black; padding-top: 8px; padding-bottom: 4px; padding-left: 8px;">Balance Due</td>
                 <td style="text-align: right" >$' . $data->event['price']-$data->amount . 'USD</td>
             </tr>
         </table>
