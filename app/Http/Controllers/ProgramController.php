@@ -23,15 +23,15 @@ class ProgramController extends Controller
             $request->validate([
                 'name' => 'required|max:255',
                 'description' => 'required',
-                // 'image_url' => 'required|file|max:1024|mimes:jpeg,png,jpg',
+                'image_url' => 'required',
             ]);
 
             // Creación de un nuevo programa en la base de datos
             $program = new Program();
             $program->name = $request->name;
             $program->description = $request->description;
-            // $program->image_url = $request->image_url;
-            $program->image_url = "img_url_aws";
+            $program->image_url = $request->image_url;
+            //$program->image_url = "img_url_aws";
             $program->save();
 
             $response = [
