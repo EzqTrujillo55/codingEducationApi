@@ -28,6 +28,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        /*
         $this->registerPolicies();
          //SE DEBE EJECUTAR LA MIGRACION DE ROLES AQUI PARA QUE NO DE ERROR
 
@@ -78,5 +79,6 @@ class AuthServiceProvider extends ServiceProvider
         );
 
         $admin_user->assignRole($admin);
+        */
     }
 }
