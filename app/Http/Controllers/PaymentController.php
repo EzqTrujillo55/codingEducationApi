@@ -44,12 +44,23 @@ class PaymentController extends Controller
             Stripe::setApiKey($key_secret);
             
             $paymentIntent = PaymentIntent::create([
-                'amount' => $validatedData['amount'],
+                'amount' => $validatedData['amount']*100,
                 'currency' => 'USD',
+                'payment_method' => 'pm_card_visa',
+                'confirm' => true,
+                'return_url' => 'https://www.example.com',
             ]);
+
+            
+            error_log($paymentIntent);
+            
+            error_log('BEFORE CHECK');            
 
             //SUCCESS
             if($paymentIntent){
+                error_log('BEFORE CREATE');
+            
+                
                 $payment = Payment::create([
                     'user_id' => auth()->user()->id,
                     // 'invoice' => $validatedData['invoice'],
@@ -247,7 +258,7 @@ class PaymentController extends Controller
         $html .= '  p { font-size: 14px; }';
         $html .= '  #top-bar { width: 100%; background-color: #7404e8; text-align: center; color: white; font-size: 18px; padding-top: 8px; padding-bottom: 8px; font-weight: bolder; position: absolute; top: 0px }';
         $html .= '  #logo-container { position: absolute; top: 60px; }';
-        $html .= '  #address-container { position: absolute; top: 40px; right: 0px; }';
+        $html .= '  #address-container { position: absolute; top: 60px; right: 0px; }';
         $html .= '  #title-container { text-align: center; position: absolute; top: 150px; left: 42%; font-weight: bolder; }';
         $html .= '  #student-container { position: absolute; top: 180px; }';
         $html .= '  #payer-container { position: absolute; top: 200px; }';
@@ -268,7 +279,12 @@ class PaymentController extends Controller
         $html .= '</style>';
         $html .= '<div id="top-bar">R E C E I P T</div>';
         $html .= '<div id="logo-container"> <img src="' . $aaa . '" alt="Imagen" style="width: 300px; height: auto;"> </div>';
-        $html .= '<div id="address-container"> <h3>ADDRESS DATA</h3> </div>';
+        $html .= '<div id="address-container"> 
+            <span style="display: block; font-size: 12px; ">Kamps Education LLC</span>
+            <span style="display: block; font-size: 12px; ">1261 Winter Garden, Vineland Rd,</span> 
+            <span style="display: block; font-size: 12px; ">Winter Garden, FL 34787</span> 
+            <span style="display: block; font-size: 12px; ">+1 305 – 613-8105</span> 
+        </div>';
         $html .= '<div id="title-container"> R E C I P I E N T </div>';
         $html .= '<div id="student-container">Student:' . $data->student['first_name'] . ' ' . $data->student['last_name'] . '</div>';
         $html .= '<div id="payer-container">Payer:' . $data->student['parent']['fathers_name'] . '</div>';
