@@ -110,11 +110,12 @@ class AuthController extends Controller
 
             error_log('Aca estoiy3;');
             
+            /*
             $role = Role::where('name', 'Tutor')->first();
             $user->assignRole($role);
             $permissions = Permission::whereIn('name', ['create_student', 'edit_student'])->get();
             $user->givePermissionTo($permissions);
-            
+            */
 
 
             error_log('Aca estoiy4;');
